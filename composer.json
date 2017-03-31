@@ -1,0 +1,22 @@
+{
+    "name": "enigmatix/yii2-dynamicforms",
+    "description": "This library relies on jQuery formBuilder for user driven custom forms.  It can be used to overwrite a default configuration, or simply extend it.",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension","forms","formBuilder"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joel Small",
+            "email": "joel.small@biscon.com.au"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*",
+        "enigmatix/yii2-formbuilder": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "enigmatix\\dynamicforms\\": ""
+        }
+    }
+}
