@@ -3,6 +3,7 @@
 namespace enigmatix\dynamicforms;
 
 use Yii;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -12,6 +13,9 @@ use yii\filters\VerbFilter;
  */
 class DynamicFormsController extends Controller
 {
+
+    const FORM_ADMINISTRATOR = 'formAdmin';
+
     /**
      * @inheritdoc
      */
@@ -34,10 +38,27 @@ class DynamicFormsController extends Controller
      */
     public function actionCreate()
     {
-        $model = new DynamicForm();
+        $model      = new DynamicForm($this->getRequestBody());
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+
+        //Set ownership (ie, flag as custom) for forms supplied not from a person authorised to manage defaults.
+        if(!Yii::$app->user->isGuest
+            && isset(Yii::$app->authManager)
+            && !Yii::$app->user->can(self::FORM_ADMINISTRATOR)){
+            $model->owned_by = Yii::$app->user->id;
+        }
+
+        //Duplicate check
+        $duplicate = DynamicForm::findOne(['form_object' => $model->form_object, 'owned_by' => $model->owned_by]);
+
+        if($duplicate !== null){
+            return Yii::$app->runAction('dynamic-forms/update', ['id' => $duplicate->uuid,'form' => $duplicate->form_object]);
+        }
+
+        if ($model->save()) {
+
+        } else{
+            throw new \Exception('Something went wrong');
         }
     }
 
@@ -51,8 +72,8 @@ class DynamicFormsController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(['DynamicForm' => $this->getRequestBody()]) && $model->save()) {
+
         }
     }
 
@@ -78,10 +99,17 @@ class DynamicFormsController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = DynamicForm::findOne($id)) !== null) {
+        if (($model = DynamicForm::findOne(['uuid' => $id])) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    protected function getRequestBody(){
+        return [
+            'form_data'     => Yii::$app->request->rawBody,
+            'form_object'   => Yii::$app->request->get('form')
+        ];
     }
 }
