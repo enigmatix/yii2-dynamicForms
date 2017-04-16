@@ -12,11 +12,18 @@
     ],
     "require": {
         "yiisoft/yii2": "*",
-        "enigmatix/yii2-formbuilder": "*"
+        "enigmatix/yii2-formbuilder": "*",
+        "enigmatix/yii2-uuid": "*"
     },
     "autoload": {
         "psr-4": {
             "enigmatix\\dynamicforms\\": ""
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/enigmatix/yii2-uuid"
+        }
+    ]
 }
