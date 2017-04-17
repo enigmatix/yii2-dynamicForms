@@ -105,7 +105,7 @@ class DynamicForm extends ActiveRecord
 
         if ($this->form_data === null){
             $this->form_data = json_encode([[
-                'type' => 'text',
+                'type' => 'textarea',
                 'label' => 'Notes',
                 'subtype' => 'text',
                 'className' => 'form-control',

@@ -50,7 +50,8 @@ class FormRenderWidget extends Widget
     protected function renderField($fieldConfig){
 
         $id           = Html::getInputId($this->model, $fieldConfig['name']);
-        $activeField  = $this->form->field($this->model, $fieldConfig['name']);
+        $activeField  = $this->form->field($this->model,
+            $fieldConfig['name']);
 
         $type         = static::getFunctionType($fieldConfig['type']);
         $functionName = static::getFunctionName($type);
@@ -64,7 +65,7 @@ class FormRenderWidget extends Widget
 
         }
 
-        return $output;
+        return $output . PHP_EOL;
     }
 
     protected static function getFunctionType($type)
@@ -100,28 +101,34 @@ class FormRenderWidget extends Widget
 
     protected function renderCheckboxListField($id, $activeField, $fieldConfig){
         return  Html::tag('div',
-            $activeField->checkboxList(FormBuilder::getValueList($fieldConfig['values'])),
+            $activeField
+                ->checkboxList(FormBuilder::getValueList($fieldConfig['values']))
+                ->label($fieldConfig['label']),
             ['class' => 'col-md-6']);
     }
 
     protected function renderRadioListField($id, $activeField, $fieldConfig)
     {
         return Html::tag('div',
-            $activeField->radioList(FormBuilder::getValueList($fieldConfig['values'])),
+            $activeField
+                ->radioList(FormBuilder::getValueList($fieldConfig['values']))
+                ->label($fieldConfig['label']),
             ['class' => 'col-md-6']);
     }
 
     protected function renderDropdownListField($id, $activeField, $fieldConfig)
     {
         return Html::tag('div',
-            $activeField->dropdownList(FormBuilder::getValueList($fieldConfig['values'])),
+            $activeField
+                ->dropdownList(FormBuilder::getValueList($fieldConfig['values']))
+                ->label($fieldConfig['label']),
             ['class' => 'col-md-6']);
     }
 
     protected function renderDateField($id, $activeField, $fieldConfig)
     {
         return Html::tag('div',
-            $activeField->textInput(),
+            $activeField->textInput()->label($fieldConfig['label']),
             ['class' => 'col-md-6']);
     }
 
