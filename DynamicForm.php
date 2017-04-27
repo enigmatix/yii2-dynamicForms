@@ -3,6 +3,7 @@
 namespace enigmatix\dynamicforms;
 
 use enigmatix\uuid\UUIDBehavior;
+use \yii\helpers\Inflector;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\db\ActiveRecord;
@@ -104,13 +105,9 @@ class DynamicForm extends ActiveRecord
     public function validateFormDataDefault($attribute, $params, $validator){
 
         if ($this->form_data === null){
-            $this->form_data = json_encode([[
-                'type' => 'textarea',
-                'label' => 'Notes',
-                'subtype' => 'text',
-                'className' => 'form-control',
-                'name' => 'notes',
-            ]]);
+            $this->form_data = json_encode([
+                static::textarea('Notes'),
+            ]);
         }
         return true;
     }
@@ -199,5 +196,42 @@ class DynamicForm extends ActiveRecord
 
     public function userUpdateAuthorised($user){
         
+    }
+
+    protected static function field($type, $name, array $options = [])
+    {
+        $defaults = [
+            'label'     => Inflector::titleize($name),
+            'name'      => Inflector::underscore($name),
+            'className' => 'form-control',
+        ];
+        switch ($type) {
+            case 'textarea':
+                $defaults['type']    = 'textarea';
+                $defaults['subtype'] = 'text';
+                break;
+            case 'text':
+                break;
+            case 'dropdown':
+                $defaults['type']    = 'select';
+                $values              = ArrayHelper::remove($options, 'values');
+                $structuredValues    = [];
+                foreach ($values as $key => $value) {
+                    $structuredValues[] = ['label' => $value, 'value' => $key];
+                }
+                $defaults['values'] = $structuredValues;
+                break;
+        }
+
+        return ArrayHelper::merge($defaults, $options);
+    }
+
+    public static function textarea($name, array $options = [])
+    {
+        return static::field('textarea',$name,$options);
+    }
+
+    public static function dropdown($name, array $values, array $options = []){
+        return static::field('dropdown',$name,ArrayHelper::merge(['values' => $values],$options));
     }
 }

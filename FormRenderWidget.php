@@ -26,16 +26,23 @@ class FormRenderWidget extends Widget
     public $view;
     public $form;
     public $formData;
+    public $formToggle = false;
 
     public function run(){
-        
-        $output = Html::tag('h2', 'Custom Fields');
+
+        $toggle = '';
+        if($this->formToggle != null){
+            $toggle = Html::button($this->formToggle['label'], $this->formToggle);
+        }
+        $output = Html::tag('h2', 'Custom Fields ' . $toggle);
+        $output .= Html::beginTag('div', ['class' => 'row']);
 
         foreach ($this->getConfigArray() as $field){
             $output     .= $this->renderField($field);
         }
 
-        return Html::tag('div', $output, ['class' => 'row well well-lg']);
+        $output .= Html::endTag('div');
+        return Html::tag('div', $output, ['class' => 'well well-lg']);
     }
 
     protected function getConfigArray(){
