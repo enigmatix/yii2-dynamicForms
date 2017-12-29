@@ -194,6 +194,29 @@ class DynamicForm extends ActiveRecord
 
     }
 
+    public static function getModelDetailStrings($model, $user = null){
+        $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
+        $fields = [];
+        foreach ($configurations as $configuration){
+            foreach (Json::decode($configuration->form_data) as $field){
+                $name = $field['name'];
+                $fields[$name] = $name . ':' . static::getFieldDisplayType($field['type']) . ':' . $field['label'];
+            }
+        }
+
+        return array_values($fields);
+
+    }
+
+    public static function getFieldDisplayType($type)
+    {
+        switch ($type) {
+            case 'textarea':
+                return 'html';
+            default:
+                return 'text';
+        }
+    }
     public function userUpdateAuthorised($user){
         
     }
