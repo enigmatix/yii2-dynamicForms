@@ -78,7 +78,7 @@ class FormBuilderWidget extends Modal
             'controller'            => $this->controller,
             'saveUrl'               => $this->getSaveUrl($formConfigModel, $this->controller),
             'pluginOptions' => [
-                'formData'              => static::getConfigurationJSON($formConfigModel, $this->controller),
+                'formData'              => static::getConfigurationJSON($formConfigModel),
                 'dataType'              => 'json',
                 'showActionButtons'     => false,
                 'disableFields' => [
