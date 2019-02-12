@@ -27,6 +27,7 @@ class FormRenderWidget extends Widget
     public $form;
     public $formData;
     public $formToggle = false;
+    public $title = 'Custom Fields';
 
     public function run(){
 
@@ -34,7 +35,7 @@ class FormRenderWidget extends Widget
         if($this->formToggle != null){
             $toggle = Html::button($this->formToggle['label'], $this->formToggle);
         }
-        $output = Html::tag('h2', 'Custom Fields ' . $toggle);
+        $output = Html::tag('h2', $this->title .' ' . $toggle);
         $output .= Html::beginTag('div', ['class' => 'row']);
 
         foreach ($this->getConfigArray() as $field){

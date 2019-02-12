@@ -184,37 +184,60 @@ class DynamicForm extends ActiveRecord
         $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
         $fields = [];
         foreach ($configurations as $configuration){
-            foreach (Json::decode($configuration->form_data) as $field){
-                $name = $field['name'];
-                $fields[$name] = $name;
-            }
+            $fields = ArrayHelper::merge($fields, static::getFieldNamesFromConfig($configuration->form_data));
         }
 
         return $fields;
 
     }
 
+    public static function getFieldNamesFromConfig($config)
+    {
+        $fields = [];
+
+        foreach (Json::decode($config) as $field){
+            $name = $field['name'];
+            $fields[$name] = $name;
+        }
+
+        return $fields;
+
+    }
+
+    public static function getDetailStringsFromConfig($config)
+    {
+        $return = [];
+        $fields = Json::decode($config);
+        foreach ($fields as $field){
+            $name = $field['name'];
+            if(array_search($name, $return) === false){
+                $return[] = static::getFieldDisplayString($name, $field);
+            }
+        }
+
+        return $return;
+    }
+
     public static function getModelDetailStrings($model, $user = null){
         $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
         $fields = [];
         foreach ($configurations as $configuration){
-            foreach (Json::decode($configuration->form_data) as $field){
-                $name = $field['name'];
-                $fields[$name] = $name . ':' . static::getFieldDisplayType($field['type']) . ':' . $field['label'];
-            }
+            $fields = ArrayHelper::merge($fields, static::getDetailStringsFromConfig($configuration->form_data));
         }
 
         return array_values($fields);
 
     }
 
-    public static function getFieldDisplayType($type)
+    public static function getFieldDisplayString($name, $field)
     {
-        switch ($type) {
+        switch ($field['type']) {
             case 'textarea':
-                return 'html';
+                return $name.':html:' . $field['label'];
+            case 'checkbox-group':
+                return 'valueString' . ucfirst($name) . ':html:' . $field['label'];
             default:
-                return 'text';
+                return $name . ':text:' . $field['label'];
         }
     }
     public function userUpdateAuthorised($user){
