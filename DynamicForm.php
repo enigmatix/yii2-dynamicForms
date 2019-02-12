@@ -210,6 +210,7 @@ class DynamicForm extends ActiveRecord
         $fields = Json::decode($config);
         foreach ($fields as $field){
             $name = $field['name'];
+
             if(array_search($name, $return) === false){
                 $return[] = static::getFieldDisplayString($name, $field);
             }
