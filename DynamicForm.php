@@ -180,22 +180,33 @@ class DynamicForm extends ActiveRecord
         return $results;
     }
 
-    public static function getModelFields($model, $user = null){
+    public static function getModelFields($model, $user = null, $filter = null){
         $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
         $fields = [];
         foreach ($configurations as $configuration){
-            $fields = ArrayHelper::merge($fields, static::getFieldNamesFromConfig($configuration->form_data));
+            $fields = ArrayHelper::merge($fields, static::getFieldNamesFromConfig($configuration->form_data, $filter));
         }
 
         return $fields;
 
     }
 
-    public static function getFieldNamesFromConfig($config)
+    public static function getFieldNamesFromConfig($config, $filter = null)
     {
         $fields = [];
 
         foreach (Json::decode($config) as $field){
+            if($filter !== null){
+                if(is_string($filter)){
+                    if(ArrayHelper::getValue($field, $filter) === null){
+                        continue;
+                    }
+                } else if (is_callable($filter)) {
+                    if(!call_user_func($filter, $field)){
+                        continue;
+                    }
+                }
+            }
             $name = $field['name'];
             $fields[$name] = $name;
         }
