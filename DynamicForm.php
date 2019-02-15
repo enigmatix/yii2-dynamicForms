@@ -193,6 +193,15 @@ class DynamicForm extends ActiveRecord
 
     public static function getFieldNamesFromConfig($config, $filter = null)
     {
+        return static::getFieldAttributeFromConfig($config, 'name', $filter);
+    }
+
+    public static function getFieldLabelsFromConfig($config, $filter = null)
+    {
+        return static::getFieldAttributeFromConfig($config, 'label', $filter);
+    }
+    public static function getFieldAttributeFromConfig($config, $attribute, $filter = null)
+    {
         $fields = [];
 
         foreach (Json::decode($config) as $field){
@@ -207,12 +216,12 @@ class DynamicForm extends ActiveRecord
                     }
                 }
             }
-            $name = $field['name'];
-            $fields[$name] = $name;
+            $name           = $field['name'];
+            $value          = $field[$attribute];
+            $fields[$name]  = $value;
         }
 
         return $fields;
-
     }
 
     public static function getDetailStringsFromConfig($config)
@@ -239,6 +248,18 @@ class DynamicForm extends ActiveRecord
 
         return array_values($fields);
 
+    }
+
+    public static function getModelLabels($model, $user = null ){
+
+        $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
+        $fields = [];
+        foreach ($configurations as $configuration){
+            $fields = ArrayHelper::merge($fields, static::getFieldLabelsFromConfig($configuration->form_data));
+        }
+
+        return $fields;
+        
     }
 
     public static function getFieldDisplayString($name, $field)

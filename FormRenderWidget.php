@@ -110,8 +110,7 @@ class FormRenderWidget extends Widget
     protected function renderCheckboxListField($id, $activeField, $fieldConfig){
         return  Html::tag('div',
             $activeField
-                ->checkboxList(FormBuilder::getValueList($fieldConfig['values']))
-                ->label($fieldConfig['label']),
+                ->checkboxList(FormBuilder::getValueList($fieldConfig['values'])),
             ['class' => 'col-md-6']);
     }
 
@@ -119,8 +118,7 @@ class FormRenderWidget extends Widget
     {
         return Html::tag('div',
             $activeField
-                ->radioList(FormBuilder::getValueList($fieldConfig['values']))
-                ->label($fieldConfig['label']),
+                ->radioList(FormBuilder::getValueList($fieldConfig['values'])),
             ['class' => 'col-md-6']);
     }
 
@@ -128,15 +126,14 @@ class FormRenderWidget extends Widget
     {
         return Html::tag('div',
             $activeField
-                ->dropdownList(FormBuilder::getValueList($fieldConfig['values']))
-                ->label($fieldConfig['label']),
+                ->dropdownList(FormBuilder::getValueList($fieldConfig['values'])),
             ['class' => 'col-md-6']);
     }
 
     protected function renderDateField($id, $activeField, $fieldConfig)
     {
         return Html::tag('div',
-            $activeField->textInput()->label($fieldConfig['label']),
+            $activeField->textInput(),
             ['class' => 'col-md-6']);
     }
 
