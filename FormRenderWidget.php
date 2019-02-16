@@ -28,6 +28,7 @@ class FormRenderWidget extends Widget
     public $formData;
     public $formToggle = false;
     public $title = 'Custom Fields';
+    public $options;
 
     public function run(){
 
@@ -43,7 +44,12 @@ class FormRenderWidget extends Widget
         }
 
         $output .= Html::endTag('div');
-        return Html::tag('div', $output, ['class' => 'well well-lg']);
+        return Html::tag('div', $output, ['class' => $this->getClass()]);
+    }
+
+    protected function getClass()
+    {
+        return ArrayHelper::getValue($this,'options.class', 'col-sm-12 well well-lg');
     }
 
     protected function getConfigArray(){
