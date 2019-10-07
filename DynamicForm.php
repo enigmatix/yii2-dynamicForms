@@ -197,11 +197,26 @@ class DynamicForm extends ActiveRecord
 
     }
 
+    public static function getModelFieldConfigurations ($model, $user)
+    {
+        $config = static::getModelConfig(StringHelper::basename($model->className()), $user);
+        $fields = [];
+        foreach ($config as $configuration){
+            $fields = ArrayHelper::merge($fields, static::getFieldsConfigurationsFromConfig($configuration->form_data));
+        }
+
+        return $fields;
+
+    }
+
     public static function getModelDropdownValueLabel($model, $attribute, $user = null)
     {
         $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
         foreach ($configurations as $configuration) {
             $field = static::getFieldFromConfig($configuration->form_data,$attribute);
+            if($field === null){
+                continue;
+            }
             foreach ($field['values'] as $value){
                 if($value['value'] === $model->$attribute){
                     return $value['label'];
@@ -239,6 +254,11 @@ class DynamicForm extends ActiveRecord
     public static function getFieldNamesFromConfig($config, $filter = null)
     {
         return static::getFieldAttributeFromConfig($config, 'name', $filter);
+    }
+
+    public static function getFieldsConfigurationsFromConfig($config)
+    {
+        return Json::decode($config);
     }
 
     public static function getFieldLabelsFromConfig($config, $filter = null)
@@ -307,19 +327,44 @@ class DynamicForm extends ActiveRecord
 
     }
 
-    public static function getFieldDisplayString($name, $field)
+    public static function getFieldDisplayString($name, $fieldConfig)
     {
-        switch ($field['type']) {
+        switch ($fieldConfig['type']) {
             case 'textarea':
-                return $name . ':html:' . $field['label'];
+                return static::getFieldDisplayAttribute($name, $fieldConfig) . ':html:' . $fieldConfig['label'];
             case 'checkbox-group':
             case 'dropdown':
-                return $name . 'LabelString' . ':html:' . $field['label'];
+                return static::getFieldDisplayAttribute($name, $fieldConfig) . ':html:' . $fieldConfig['label'];
             case 'select':
-                return $name . 'LabelString' . ':text:' . $field['label'];
+                return static::getFieldDisplayAttribute($name, $fieldConfig) . ':text:' . $fieldConfig['label'];
             default:
-                return $name . ':text:' . $field['label'];
+                return static::getFieldDisplayAttribute($name, $fieldConfig) . ':text:' . $fieldConfig['label'];
         }
+    }
+
+    public static function getFieldDisplayAttribute($name, $fieldConfig)
+    {
+        switch ($fieldConfig['type']) {
+            case 'textarea':
+                return $name;
+            case 'checkbox-group':
+            case 'dropdown':
+                return $name . 'LabelString';
+            case 'select':
+                return $name . 'LabelString';
+            default:
+                return $name;
+        }
+    }
+
+    public function getFieldConfig($name)
+    {
+
+    }
+
+    public function getFields()
+    {
+
     }
 
     public function userUpdateAuthorised($user)
