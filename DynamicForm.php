@@ -113,8 +113,8 @@ class DynamicForm extends ActiveRecord
     }
 
     /**
-    * @inheritdoc
-    */
+     * @inheritdoc
+     */
     public function relations()
     {
         return [
@@ -132,7 +132,7 @@ class DynamicForm extends ActiveRecord
     {
         return $this->hasOne($this->getUserClass(), ['id' => 'created_by']);
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -154,6 +154,12 @@ class DynamicForm extends ActiveRecord
         return ArrayHelper::getValue(Yii::$app, 'user.identityClass');
     }
 
+    /**
+     * @param      $modelName
+     * @param null $user
+     *
+     * @return DynamicForm[]
+     */
     public static function getModelConfig($modelName, $user = null)
     {
 
@@ -189,6 +195,45 @@ class DynamicForm extends ActiveRecord
 
         return $fields;
 
+    }
+
+    public static function getModelDropdownValueLabel($model, $attribute, $user = null)
+    {
+        $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
+        foreach ($configurations as $configuration) {
+            $field = static::getFieldFromConfig($configuration->form_data,$attribute);
+            foreach ($field['values'] as $value){
+                if($value['value'] === $model->$attribute){
+                    return $value['label'];
+                }
+            }
+        }
+    }
+
+    public function getFormData()
+    {
+        return Json::decode($this->form_data);
+    }
+
+    public static function getFieldFromConfig($config, $field) {
+
+        foreach (Json::decode($config) as $node) {
+            if($node['name'] === $field){
+                return $node;
+            }
+        }
+    }
+
+    public static function getFieldOptionsFromConfig($config, $filter)
+    {
+        return static::getFieldAttributeFromConfig($config, 'values', $filter);
+    }
+
+    public static function getDropdownValueLabel($config, $field, $value)
+    {
+        $values = static::getFieldOptionsFromConfig($config, $field);
+
+        return $values[$value];
     }
 
     public static function getFieldNamesFromConfig($config, $filter = null)
@@ -259,22 +304,27 @@ class DynamicForm extends ActiveRecord
         }
 
         return $fields;
-        
+
     }
 
     public static function getFieldDisplayString($name, $field)
     {
         switch ($field['type']) {
             case 'textarea':
-                return $name.':html:' . $field['label'];
+                return $name . ':html:' . $field['label'];
             case 'checkbox-group':
-                return 'valueString' . ucfirst($name) . ':html:' . $field['label'];
+            case 'dropdown':
+                return $name . 'LabelString' . ':html:' . $field['label'];
+            case 'select':
+                return $name . 'LabelString' . ':text:' . $field['label'];
             default:
                 return $name . ':text:' . $field['label'];
         }
     }
-    public function userUpdateAuthorised($user){
-        
+
+    public function userUpdateAuthorised($user)
+    {
+
     }
 
     protected static function field($type, $name, array $options = [])
