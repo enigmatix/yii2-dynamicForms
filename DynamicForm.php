@@ -315,7 +315,8 @@ class DynamicForm extends ActiveRecord
 
     }
 
-    public static function getModelLabels($model, $user = null ){
+    public static function getModelLabels($model, $user = null )
+    {
 
         $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
         $fields = [];
@@ -337,6 +338,10 @@ class DynamicForm extends ActiveRecord
                 return static::getFieldDisplayAttribute($name, $fieldConfig) . ':html:' . $fieldConfig['label'];
             case 'select':
                 return static::getFieldDisplayAttribute($name, $fieldConfig) . ':text:' . $fieldConfig['label'];
+            case 'file':
+            case 'link':
+            case 'url':
+                return static::getFieldDisplayAttribute($name, $fieldConfig) . ':url:' . $fieldConfig['label'];
             default:
                 return static::getFieldDisplayAttribute($name, $fieldConfig) . ':text:' . $fieldConfig['label'];
         }
