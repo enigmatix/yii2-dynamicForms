@@ -110,6 +110,9 @@ class FormRenderWidget extends Widget
             case 'date':
                 return 'date';
                 break;
+            case 'header':
+                return 'header';
+                break;
             }
     }
 
@@ -143,6 +146,10 @@ class FormRenderWidget extends Widget
             ['class' => 'col-md-6']);
     }
 
+    protected function renderHeaderField($id, $activeField, $fieldConfig)
+    {
+        return Html::tag('h3', $fieldConfig['text']);
+    }
 
     protected static function getFunctionName($function){
         return 'render' . ucfirst($function) . 'Field';

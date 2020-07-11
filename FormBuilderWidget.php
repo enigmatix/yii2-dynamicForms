@@ -82,7 +82,6 @@ class FormBuilderWidget extends Modal
                 'dataType'              => 'json',
                 'showActionButtons'     => false,
                 'disableFields' => [
-                    'header',
                     'paragraph',
                     'number',
                     'autocomplete',
