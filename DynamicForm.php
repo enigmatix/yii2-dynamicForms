@@ -397,6 +397,8 @@ class DynamicForm extends ActiveRecord
                 $defaults['subtype'] = 'text';
                 break;
             case 'text':
+                $defaults['type']    = 'text';
+                $defaults['subtype'] = 'text';
                 break;
             case 'dropdown':
                 $defaults['type']    = 'select';
@@ -410,6 +412,11 @@ class DynamicForm extends ActiveRecord
         }
 
         return ArrayHelper::merge($defaults, $options);
+    }
+
+    public static function text($name, array $options = [])
+    {
+        return static::field('text',$name,$options);
     }
 
     public static function textarea($name, array $options = [])
