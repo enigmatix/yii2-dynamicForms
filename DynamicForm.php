@@ -3,6 +3,7 @@
 namespace enigmatix\dynamicforms;
 
 use enigmatix\uuid\UUIDBehavior;
+use yii\base\InvalidCallException;
 use \yii\helpers\Inflector;
 use Yii;
 use yii\behaviors\BlameableBehavior;
@@ -160,9 +161,8 @@ class DynamicForm extends ActiveRecord
      *
      * @return DynamicForm[]
      */
-    public static function getModelConfig($modelName, $user = null)
+    public static function getModelConfig($modelName, $user = null, $account = null)
     {
-
         $results    = [];
 
         if($user !== null){
@@ -172,7 +172,14 @@ class DynamicForm extends ActiveRecord
             }
         }
 
-        $default = static::findOne(['form_object' => $modelName, 'owned_by' => null]);
+        if($account !== null){
+            $custom = static::findOne(['form_object' => $modelName, 'account_id' => $account]);
+            if($custom !== null){
+                $results[] = $custom;
+            }
+        }
+
+        $default = static::findOne(['form_object' => $modelName, 'owned_by' => null, 'account_id' => null]);
         if($default !== null){
             $results[]  = $default;
         }
@@ -186,8 +193,8 @@ class DynamicForm extends ActiveRecord
         return $results;
     }
 
-    public static function getModelFields($model, $user = null, $filter = null){
-        $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
+    public static function getModelFields($model, $user = null, $account = null, $filter = null){
+        $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user, $account);
         $fields = [];
         foreach ($configurations as $configuration){
             $fields = ArrayHelper::merge($fields, static::getFieldNamesFromConfig($configuration->form_data, $filter));
@@ -197,9 +204,9 @@ class DynamicForm extends ActiveRecord
 
     }
 
-    public static function getModelFieldConfigurations ($model, $user)
+    public static function getModelFieldConfigurations ($model, $user, $account = null)
     {
-        $config = static::getModelConfig(StringHelper::basename($model->className()), $user);
+        $config = static::getModelConfig(StringHelper::basename($model->className()), $user, $account);
         $fields = [];
         foreach ($config as $configuration){
             $fields = ArrayHelper::merge($fields, static::getFieldsConfigurationsFromConfig($configuration->form_data));
@@ -209,9 +216,9 @@ class DynamicForm extends ActiveRecord
 
     }
 
-    public static function getModelDropdownValueLabel($model, $attribute, $user = null)
+    public static function getModelDropdownValueLabel($model, $attribute, $user = null, $account = null)
     {
-        $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
+        $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user, $account);
         foreach ($configurations as $configuration) {
             $field = static::getFieldFromConfig($configuration->form_data,$attribute);
             if($field === null){
@@ -304,8 +311,8 @@ class DynamicForm extends ActiveRecord
         return $return;
     }
 
-    public static function getModelDetailStrings($model, $user = null){
-        $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
+    public static function getModelDetailStrings($model, $user = null, $account = null){
+        $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user, $account);
         $fields = [];
         foreach ($configurations as $configuration){
             $fields = ArrayHelper::merge($fields, static::getDetailStringsFromConfig($configuration->form_data));
@@ -315,10 +322,10 @@ class DynamicForm extends ActiveRecord
 
     }
 
-    public static function getModelLabels($model, $user = null )
+    public static function getModelLabels($model, $user = null, $account = null )
     {
 
-        $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user);
+        $configurations = static::getModelConfig(StringHelper::basename($model->className()), $user, $account);
         $fields = [];
         foreach ($configurations as $configuration){
             $fields = ArrayHelper::merge($fields, static::getFieldLabelsFromConfig($configuration->form_data));
