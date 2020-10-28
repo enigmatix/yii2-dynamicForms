@@ -427,4 +427,8 @@ class DynamicForm extends ActiveRecord
     public static function dropdown($name, array $values, array $options = []){
         return static::field('dropdown',$name,ArrayHelper::merge(['values' => $values],$options));
     }
+
+    public static function date($name, array $options = []){
+        return static::field('date', $name, $options);
+    }
 }
