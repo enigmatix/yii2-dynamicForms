@@ -400,6 +400,10 @@ class DynamicForm extends ActiveRecord
                 $defaults['type']    = 'text';
                 $defaults['subtype'] = 'text';
                 break;
+            case 'date':
+                $defaults['type']    = 'date';
+                $defaults['subtype'] = 'date';
+                break;
             case 'dropdown':
                 $defaults['type']    = 'select';
                 $values              = ArrayHelper::remove($options, 'values');
